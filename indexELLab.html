@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EL Application Lab | Math 172 | Santa Ana College</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal-900:#0b3d3f;
+    --teal-700:#12595c;
+    --teal-500:#1c8b90;
+    --teal-100:#e3f1f1;
+    --gold-500:#e2a63b;
+    --gold-100:#fbead0;
+    --crimson:#8a1538;
+    --bg:#faf7f2;
+    --card:#ffffff;
+    --text:#1f2a2c;
+    --muted:#5b6b6c;
+    --border:#dcd6c8;
+    --correct:#2f7d32;
+    --correct-bg:#e8f5e9;
+    --incorrect:#c0392b;
+    --incorrect-bg:#fdecea;
+    --radius:14px;
+    --shadow:0 2px 10px rgba(11,61,63,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'DM Sans', system-ui, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.5;
+    padding-bottom:3rem;
+  }
+  .math, .mono{ font-family:'DM Mono', monospace; }
+  header.app-header{
+    background:var(--teal-900);
+    color:#fff;
+    padding:1.25rem 1.25rem 0;
+  }
+  .header-inner{ max-width:780px; margin:0 auto; }
+  .app-header h1{ margin:0 0 .15rem; font-size:1.35rem; font-weight:700; }
+  .app-header p.tagline{ margin:0 0 1rem; color:var(--teal-100); font-size:.92rem; }
+  nav.mode-tabs{ display:flex; gap:.4rem; }
+  .mode-tab{
+    flex:1;
+    text-align:center;
+    padding:.65rem .5rem;
+    font-size:.85rem;
+    font-weight:600;
+    border:none;
+    border-radius:10px 10px 0 0;
+    background:rgba(255,255,255,0.08);
+    color:var(--teal-100);
+    cursor:pointer;
+  }
+  .mode-tab[aria-selected="true"]{ background:var(--bg); color:var(--teal-900); }
+  .mode-tab[disabled]{ cursor:not-allowed; opacity:.6; }
+  .mode-tab .badge{
+    display:block; font-size:.65rem; font-weight:600; margin-top:.15rem;
+    text-transform:uppercase; letter-spacing:.03em;
+  }
+
+  html.class-mode{ font-size:125%; }
+  html.class-mode .status-row .streak{ display:none; }
+  html.class-mode main{ max-width:900px; }
+
+  .class-mode-row{ display:flex; justify-content:flex-end; padding-top:.6rem; }
+  .mode-toggle{
+    display:inline-flex; align-items:center; gap:.4rem;
+    background:rgba(255,255,255,0.08); color:var(--teal-100);
+    border:1.5px solid rgba(255,255,255,0.25); border-radius:999px;
+    padding:.35rem .8rem; font-size:.8rem; font-weight:600; cursor:pointer;
+  }
+  .mode-toggle[aria-pressed="true"]{ background:var(--gold-500); color:var(--teal-900); border-color:var(--gold-500); }
+
+  .continue-btn{ display:block; margin-top:.85rem; }
+
+  main{ max-width:780px; margin:0 auto; padding:1.25rem; }
+
+  .status-row{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:1rem; font-size:.85rem; color:var(--muted);
+  }
+  .status-row .streak{
+    display:inline-flex; align-items:center; gap:.35rem;
+    background:var(--gold-100); color:#7a5310; font-weight:700;
+    padding:.3rem .65rem; border-radius:999px;
+  }
+
+  .card{
+    background:var(--card); border:1px solid var(--border);
+    border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:1.25rem; margin-bottom:1rem;
+  }
+
+  .scenario-title{ margin:0 0 .35rem; font-size:1.1rem; color:var(--teal-900); }
+  .scenario-text{ margin:0 0 1rem; }
+  .given-box{
+    background:var(--teal-100); border-left:4px solid var(--teal-500);
+    border-radius:8px; padding:.75rem 1rem; font-size:.92rem; margin-bottom:1rem;
+  }
+
+  .formula-choice{ display:flex; gap:.6rem; flex-wrap:wrap; margin-bottom:1rem; }
+  .formula-option{
+    flex:1; min-width:220px; text-align:left; cursor:pointer;
+    border:1.5px solid var(--border); border-radius:10px; background:#fff;
+    padding:.7rem .85rem; font-family:'DM Sans', sans-serif;
+  }
+  .formula-option strong{ display:block; font-size:.85rem; color:var(--teal-900); margin-bottom:.2rem; }
+  .formula-option span.formula{ font-family:'DM Mono', monospace; font-size:.95rem; }
+  .formula-option[aria-pressed="true"]{ border-color:var(--teal-700); background:var(--teal-100); }
+  .formula-option:focus-visible{ outline:3px solid var(--teal-500); outline-offset:1px; }
+
+  .field-row{ display:flex; gap:.75rem; flex-wrap:wrap; margin-bottom:.75rem; }
+  .field{ flex:1; min-width:130px; }
+  .field label{ display:block; font-size:.85rem; font-weight:600; margin-bottom:.3rem; }
+  .field input[type="number"], .field input[type="text"]{
+    width:100%; padding:.6rem .7rem; border:1.5px solid var(--border);
+    border-radius:8px; font-family:'DM Mono', monospace; font-size:1rem;
+  }
+  .field input:focus{ outline:3px solid var(--teal-500); outline-offset:1px; }
+
+  button.primary{
+    background:var(--teal-700); color:#fff; border:none; border-radius:8px;
+    padding:.65rem 1.1rem; font-weight:700; font-size:.95rem; cursor:pointer;
+  }
+  button.primary:hover{ background:var(--teal-900); }
+  button.primary:disabled{ background:#a7b7b7; cursor:not-allowed; }
+  button.secondary{
+    background:transparent; color:var(--teal-700); border:1.5px solid var(--teal-700);
+    border-radius:8px; padding:.55rem 1rem; font-weight:600; font-size:.88rem; cursor:pointer;
+  }
+  button.secondary:hover{ background:var(--teal-100); }
+
+  .feedback{
+    margin-top:.75rem; padding:.65rem .85rem; border-radius:8px; font-size:.92rem;
+    display:none;
+  }
+  .feedback.show{ display:block; }
+  .feedback.correct{ background:var(--correct-bg); color:var(--correct); font-weight:600; }
+  .feedback.incorrect{ background:var(--incorrect-bg); color:var(--incorrect); font-weight:600; }
+  .feedback.hint{ background:var(--gold-100); color:#7a5310; }
+
+  details.steps{ margin-top:.85rem; border-top:1px dashed var(--border); padding-top:.75rem; }
+  details.steps summary{ cursor:pointer; font-weight:600; color:var(--teal-700); }
+  details.steps .step-line{ margin:.4rem 0; font-family:'DM Mono', monospace; font-size:.92rem; }
+
+  .model-banner{
+    background:var(--teal-900); color:#fff; border-radius:10px;
+    padding:.85rem 1rem; margin-bottom:1rem; font-family:'DM Mono', monospace;
+    font-size:1.05rem; text-align:center;
+  }
+
+  svg.curve{ width:100%; height:auto; display:block; margin:.5rem 0 0; }
+
+  .reflect-box{
+    background:#fdfaf3; border:1px dashed var(--gold-500); border-radius:10px;
+    padding:1rem; margin-top:1rem;
+  }
+  .reflect-box p.prompt{ font-weight:600; margin:0 0 .5rem; color:#7a5310; }
+  .reflect-box textarea{
+    width:100%; min-height:70px; border:1.5px solid var(--border); border-radius:8px;
+    padding:.6rem; font-family:'DM Sans', sans-serif; font-size:.92rem; resize:vertical;
+  }
+  .reflect-note{ font-size:.78rem; color:var(--muted); margin-top:.35rem; }
+
+  .nav-row{ display:flex; justify-content:flex-end; margin-top:1rem; }
+
+  .coming-soon-card{ text-align:center; color:var(--muted); padding:2.5rem 1.5rem; }
+  .coming-soon-card h2{ color:var(--teal-900); margin-bottom:.4rem; }
+
+  footer{
+    max-width:780px; margin:1.5rem auto 0; padding:0 1.25rem;
+    text-align:center; font-size:.8rem; color:var(--muted);
+  }
+
+  @media (max-width:480px){
+    .app-header h1{ font-size:1.15rem; }
+    .mode-tab{ font-size:.75rem; padding:.55rem .3rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-inner">
+    <h1>EL Application Lab</h1>
+    <p class="tagline">Math 172 · Precalculus · Build It, then Solve It</p>
+    <nav class="mode-tabs" role="tablist" aria-label="Application context">
+      <button class="mode-tab" role="tab" id="tab-growth" aria-selected="true" data-mode="growth">Growth</button>
+      <button class="mode-tab" role="tab" id="tab-finance" aria-selected="false" data-mode="finance">
+        Finance
+      </button>
+      <button class="mode-tab" role="tab" id="tab-cooling" aria-selected="false" data-mode="cooling">
+        Cooling &amp; Decay
+      </button>
+    </nav>
+    <div class="class-mode-row">
+      <button id="class-mode-toggle" class="mode-toggle" aria-pressed="false" type="button">
+        <span aria-hidden="true">🎓</span> Class Mode
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main-region">
+  <div class="status-row">
+    <span id="progress-label">Item 1 of 6</span>
+    <span class="streak"><span aria-hidden="true">🔥</span> <span id="streak-count">0</span> streak</span>
+  </div>
+
+  <div id="app-panel"></div>
+</main>
+
+<footer>
+  Math 172 · Precalculus &nbsp;·&nbsp; v1.3 &nbsp;·&nbsp; Built for Santa Ana College
+</footer>
+
+<script>
+/* ---------------------------------------------------------
+   DATA — single source of truth for Growth Mode items.
+   Finance/Cooling scaffolded with same shape, empty for now.
+--------------------------------------------------------- */
+const growthItems = [
+  {
+    id:'g1', title:'Viral Video Views',
+    scenario:"A video posted online had 300 views on day 2. By day 6, it had 4,800 views.",
+    buildType:'twoPoints', xLabel:'day', yLabel:'views',
+    given:{ x1:2, y1:300, x2:6, y2:4800 },
+    evaluate:{ x:10, prompt:'How many views will the video have on day 10?' },
+    solve:{ y:19200, prompt:'On what day does the video reach 19,200 views?' },
+    reflect:'Why do we substitute x into the model to evaluate, but take a logarithm to solve for x?'
+  },
+  {
+    id:'g2', title:'App Downloads',
+    scenario:"A new app had 100 downloads on day 0 (launch day). By day 5, it had 3,200 downloads.",
+    buildType:'startAndPoint', xLabel:'day', yLabel:'downloads',
+    given:{ a:100, x2:5, y2:3200 },
+    evaluate:{ x:8, prompt:'How many downloads will there be on day 8?' },
+    solve:{ y:6400, prompt:'On what day does the app reach 6,400 downloads?' },
+    reflect:'What does the value of a tell you about this app, in plain English?'
+  },
+  {
+    id:'g3', title:'Social Media Followers',
+    scenario:"An account had 200 followers at launch (month 0). After 4 months, it had 800 followers.",
+    buildType:'startAndPoint', xLabel:'month', yLabel:'followers',
+    given:{ a:200, x2:4, y2:800 },
+    evaluate:{ x:10, prompt:'How many followers will there be after 10 months?' },
+    solve:{ y:12800, prompt:'After how many months does the account reach 12,800 followers?' },
+    reflect:'The growth factor here is not a whole number. Does that change how you use it? Why or why not?'
+  },
+  {
+    id:'g4', title:'Wildlife Refuge Deer Population',
+    scenario:"A wildlife refuge recorded 80 deer in 2006 (treat 2006 as year 0). By 2012, the population had grown to 180 deer.",
+    buildType:'startAndPoint', xLabel:'year', yLabel:'deer',
+    given:{ a:80, x2:6, y2:180 },
+    evaluate:{ x:14, prompt:'About how many deer are there 14 years after 2006 (i.e., in 2020)?' },
+    solve:{ y:250, prompt:'About how many years after 2006 does the population reach 250 deer?' },
+    reflect:'Your answer for "years until 250 deer" was a decimal. What does that decimal mean in the context of a real population?'
+  },
+  {
+    id:'g5', title:'Startup Users',
+    scenario:"A tech startup had 12,000 users after its first 9 months. Three months into launch (month 3), it had already reached 3,000 users.",
+    buildType:'twoPoints', xLabel:'month', yLabel:'users',
+    given:{ x1:9, y1:12000, x2:3, y2:3000 },
+    evaluate:{ x:15, prompt:'About how many users will the startup have after 15 months?' },
+    solve:{ y:96000, prompt:'About how many months until the startup reaches 96,000 users?' },
+    reflect:'The two data points were given out of time order in the scenario. What could go wrong if you plugged them into the ratio in the order they were given?'
+  },
+  {
+    id:'g6', title:'Coral Reef Fish Population',
+    scenario:"A reef restoration site had 50 fish at the start of monitoring (year 0). After 1.5 years, the population had grown to 90 fish.",
+    buildType:'startAndPoint', xLabel:'year', yLabel:'fish',
+    given:{ a:50, x2:1.5, y2:90 },
+    evaluate:{ x:3, prompt:'About how many fish will be at the site after 3 years?' },
+    solve:{ y:300, prompt:'About how many years until the population reaches 300 fish?' },
+    reflect:'This model was built from a data point at a fractional year (1.5). Why does that not cause any problem for the exponential model?'
+  }
+];
+
+const financeItems = [
+  {
+    id:'f1', kind:'finance', title:'Savings Account',
+    scenario:"You deposit $2,000 into a savings account that pays 5% annual interest, compounded annually.",
+    xLabel:'year', yLabel:'account value ($)',
+    given:{ P:2000, r:0.05, n:1, type:'periodic' },
+    evaluate:{ x:10, prompt:'How much is the account worth after 10 years?' },
+    solve:{ y:4000, prompt:'How many years until the account doubles to $4,000?' },
+    reflect:'Why does "compounded annually" mean n = 1, and how does that make b just equal to (1 + r)?'
+  },
+  {
+    id:'f2', kind:'finance', title:'Certificate of Deposit',
+    scenario:"You deposit $1,500 into a CD that earns 6% annual interest, compounded quarterly.",
+    xLabel:'year', yLabel:'account value ($)',
+    given:{ P:1500, r:0.06, n:4, type:'periodic' },
+    evaluate:{ x:8, prompt:'How much is the CD worth after 8 years?' },
+    solve:{ y:3000, prompt:'How many years until the CD doubles to $3,000?' },
+    reflect:'If someone assumed "quarterly" meant n = 3 instead of 4, would the account be over- or under-estimated? Why?'
+  },
+  {
+    id:'f3', kind:'finance', title:'Continuous Growth Investment',
+    scenario:"You deposit $1,000 into an investment account that grows according to continuous compounding, at an annual rate of 4%.",
+    xLabel:'year', yLabel:'account value ($)',
+    given:{ P:1000, r:0.04, n:null, type:'continuous' },
+    evaluate:{ x:15, prompt:'How much is the account worth after 15 years?' },
+    solve:{ y:2000, prompt:'How many years until the account doubles to $2,000?' },
+    reflect:'Here b came from e^r instead of (1 + r/n)^n. Why does continuous compounding skip the n altogether?'
+  },
+  {
+    id:'f4', kind:'finance', title:'High-Yield Savings',
+    scenario:"You deposit $3,000 into a high-yield savings account that earns 5% annual interest, compounded daily (assume 365 days per year).",
+    xLabel:'year', yLabel:'account value ($)',
+    given:{ P:3000, r:0.05, n:365, type:'periodic' },
+    evaluate:{ x:12, prompt:'How much is the account worth after 12 years?' },
+    solve:{ y:6000, prompt:'How many years until the account doubles to $6,000?' },
+    reflect:'Daily compounding (n = 365) gives a b value nearly identical to continuous compounding. Does that mean they\u2019re the same formula? Why does the distinction still matter?'
+  }
+];   // Finance Mode — v1.1
+const coolingItems = [
+  {
+    id:'d1', kind:'cooling', title:'Drug Concentration', buildType:'percentDirect',
+    scenario:"A patient is given a 200 mg dose of a medication. The concentration in the bloodstream decreases by 15% each hour.",
+    xLabel:'hour', yLabel:'concentration (mg)',
+    given:{ a:200, percent:0.15, C:0 },
+    evaluate:{ x:6, prompt:'About how much medication remains after 6 hours?' },
+    solve:{ y:50, prompt:'About how many hours until only 50 mg remains?' },
+    reflect:'The concentration decays toward 0, not toward some other number. What in the scenario tells you the asymptote is 0?'
+  },
+  {
+    id:'d2', kind:'cooling', title:'Cooling Coffee', buildType:'newton',
+    scenario:"A cup of coffee is poured at 90°C into a room held at 20°C. After 10 minutes, the coffee has cooled to 65°C.",
+    xLabel:'minute', yLabel:'temperature (°C)',
+    given:{ T0:90, C:20, t2:10, T2:65 },
+    evaluate:{ x:25, prompt:'About what temperature is the coffee after 25 minutes?' },
+    solve:{ y:35, prompt:'About how many minutes until the coffee reaches 35°C?' },
+    reflect:'Before taking a log to solve for time, you had to subtract the room temperature from both sides. What would go wrong if you skipped that step?'
+  },
+  {
+    id:'d3', kind:'cooling', title:'Radioactive Decay', buildType:'continuousDecay',
+    scenario:"A 200 mg sample of a radioactive isotope decays continuously at a rate of 15% per hour.",
+    xLabel:'hour', yLabel:'mass (mg)',
+    given:{ a:200, r:-0.15, C:0 },
+    evaluate:{ x:8, prompt:'About how much of the sample remains after 8 hours?' },
+    solve:{ y:50, prompt:'About how many hours until only 50 mg remains?' },
+    reflect:'Compare this to the Drug Concentration scenario — both start by decreasing "15%," but one uses b = 1 − 0.15 and this one uses b = e^(−0.15). Why aren\u2019t those the same number?'
+  },
+  {
+    id:'d4', kind:'cooling', title:'Dessert Warming Up', buildType:'newton',
+    scenario:"A frozen dessert at −18°C is taken out of the freezer into a kitchen held at 22°C. After 10 minutes, its temperature has risen to 4°C.",
+    xLabel:'minute', yLabel:'temperature (°C)',
+    given:{ T0:-18, C:22, t2:10, T2:4 },
+    evaluate:{ x:20, prompt:'About what temperature is the dessert after 20 minutes?' },
+    solve:{ y:15, prompt:'About how many minutes until the dessert reaches 15°C?' },
+    reflect:'Here a came out negative. What does a negative a mean physically, and why does the model still work the same way?'
+  },
+  {
+    id:'d5', kind:'cooling', title:'Metal Casting', buildType:'newton',
+    scenario:"A metal casting cools from 850°C in a foundry room held at 24°C. After 45 minutes, it has cooled to 210°C.",
+    xLabel:'minute', yLabel:'temperature (°C)',
+    given:{ T0:850, C:24, t2:45, T2:210 },
+    evaluate:{ x:90, prompt:'About what temperature is the casting after 90 minutes?' },
+    solve:{ y:40, prompt:'About how many minutes until the casting reaches 40°C?' },
+    reflect:'40°C is much closer to the room temperature (24°C) than to the starting temperature. Why does that make this un-shift step more sensitive to small rounding errors?'
+  }
+];   // Cooling & Decay Mode — v1.2
+
+const modes = {
+  growth:  { key:'growth',  items:growthItems  },
+  finance: { key:'finance', items:financeItems },
+  cooling: { key:'cooling', items:coolingItems }
+};
+
+/* ---------------------------------------------------------
+   MATH ENGINE — mirrors the validated logic (see validate.js
+   used offline to cross-check every item before shipping).
+--------------------------------------------------------- */
+function solveModel(item){
+  let a, b, C = 0;
+  if(item.kind === 'finance'){
+    a = item.given.P;
+    b = item.given.type === 'continuous'
+      ? Math.exp(item.given.r)
+      : Math.pow(1 + item.given.r/item.given.n, item.given.n);
+  } else if(item.kind === 'cooling'){
+    C = item.given.C;
+    if(item.buildType === 'percentDirect'){
+      a = item.given.a;
+      b = 1 - item.given.percent;
+    } else if(item.buildType === 'continuousDecay'){
+      a = item.given.a;
+      b = Math.exp(item.given.r);
+    } else { // 'newton'
+      a = item.given.T0 - C;
+      b = Math.pow((item.given.T2 - C) / a, 1 / item.given.t2);
+    }
+  } else if(item.buildType === 'startAndPoint'){
+    a = item.given.a;
+    b = Math.pow(item.given.y2 / a, 1 / item.given.x2);
+  } else {
+    const { x1, y1, x2, y2 } = item.given;
+    const [xa, ya, xb, yb] = x1 < x2 ? [x1,y1,x2,y2] : [x2,y2,x1,y1];
+    b = Math.pow(yb/ya, 1/(xb-xa));
+    a = ya / Math.pow(b, xa);
+  }
+  return { a, b, C };
+}
+function evaluateModel(a,b,x,C=0){ return C + a * Math.pow(b,x); }
+function solveForX(a,b,y,C=0){ return Math.log((y-C)/a) / Math.log(b); }
+function withinTol(val, correct, relPct, absMin){
+  const tol = Math.max(absMin, Math.abs(correct)*relPct);
+  return Math.abs(val - correct) <= tol;
+}
+
+/* ---------------------------------------------------------
+   STATE
+--------------------------------------------------------- */
+const state = {
+  mode:'growth',
+  index:0,
+  phase:'build',   // build -> evalRound -> solveRound -> reflect -> (next)
+  streak:0,
+  buildAttempts:0,
+  evalAttempts:0,
+  solveAttempts:0,
+  model:null,
+  classMode:false
+};
+
+const panel = document.getElementById('app-panel');
+const progressLabel = document.getElementById('progress-label');
+const streakCount = document.getElementById('streak-count');
+
+/* ---------------------------------------------------------
+   CLASS MODE — projector-friendly presenter toggle:
+   larger text, no streak, manual advance instead of auto-timeout.
+--------------------------------------------------------- */
+document.getElementById('class-mode-toggle').addEventListener('click', function(){
+  state.classMode = !state.classMode;
+  this.setAttribute('aria-pressed', state.classMode);
+  document.documentElement.classList.toggle('class-mode', state.classMode);
+});
+
+// Advances to the next phase either automatically (self-paced/Student use)
+// or via a manual "Continue" button the instructor clicks (Class Mode).
+function proceedAfterCorrect(anchorEl, callback){
+  if(state.classMode){
+    const btn = document.createElement('button');
+    btn.className = 'primary continue-btn';
+    btn.id = 'continue-btn';
+    btn.textContent = 'Continue →';
+    btn.type = 'button';
+    btn.addEventListener('click', callback);
+    anchorEl.insertAdjacentElement('afterend', btn);
+    btn.focus();
+  } else {
+    setTimeout(callback, 900);
+  }
+}
+
+/* ---------------------------------------------------------
+   RENDER — mode switching
+--------------------------------------------------------- */
+document.querySelectorAll('.mode-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    if(tab.disabled) return;
+    document.querySelectorAll('.mode-tab').forEach(t=>t.setAttribute('aria-selected','false'));
+    tab.setAttribute('aria-selected','true');
+    state.mode = tab.dataset.mode;
+    state.index = 0;
+    state.phase = 'build';
+    state.streak = 0;
+    render();
+  });
+});
+
+function currentItems(){ return modes[state.mode].items; }
+function currentItem(){ return currentItems()[state.index]; }
+
+function updateStatusRow(){
+  const total = currentItems().length;
+  progressLabel.textContent = total ? `Item ${state.index+1} of ${total}` : '';
+  streakCount.textContent = state.streak;
+}
+
+function render(){
+  updateStatusRow();
+  const items = currentItems();
+  if(items.length === 0){
+    panel.innerHTML = `
+      <div class="card coming-soon-card">
+        <h2>Coming soon</h2>
+        <p>This mode follows the same Build It → Solve It pattern as Growth Mode. Growth Mode is ready to use now.</p>
+      </div>`;
+    return;
+  }
+  const item = currentItem();
+  if(state.phase === 'build') renderBuild(item);
+  else if(state.phase === 'evalRound') renderRound(item, 'evaluate');
+  else if(state.phase === 'solveRound') renderRound(item, 'solve');
+  else if(state.phase === 'reflect') renderReflect(item);
+}
+
+/* ---------------------------------------------------------
+   PHASE 1 — BUILD IT
+--------------------------------------------------------- */
+function renderBuild(item){
+  state.buildAttempts = 0;
+  state.chosenFormula = null;
+
+  if(item.kind === 'finance'){ renderFinanceBuild(item); return; }
+  if(item.kind === 'cooling'){ renderCoolingBuild(item); return; }
+
+  const givenHTML = item.buildType === 'startAndPoint'
+    ? `Starting value: <span class="mono">a = ${item.given.a}</span> (at ${item.xLabel} = 0)<br>
+       One later point: <span class="mono">${item.xLabel} = ${item.given.x2}, ${item.yLabel} = ${item.given.y2}</span>`
+    : `Point 1: <span class="mono">${item.xLabel} = ${item.given.x1}, ${item.yLabel} = ${item.given.y1}</span><br>
+       Point 2: <span class="mono">${item.xLabel} = ${item.given.x2}, ${item.yLabel} = ${item.given.y2}</span>`;
+
+  panel.innerHTML = `
+    <div class="card">
+      <h2 class="scenario-title">${item.title}</h2>
+      <p class="scenario-text">${item.scenario}</p>
+      <div class="given-box">${givenHTML}</div>
+
+      <p><strong>Build It:</strong> find <span class="math">a</span> and <span class="math">b</span> for the model
+      <span class="math">y = a &middot; b<sup>x</sup></span>.</p>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="input-a">a =</label>
+          <input type="number" id="input-a" step="any" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="input-b">b = (round to 3 decimals)</label>
+          <input type="number" id="input-b" step="any" inputmode="decimal">
+        </div>
+      </div>
+
+      <button class="primary" id="check-build">Check</button>
+      <div class="feedback" id="build-feedback" aria-live="polite"></div>
+
+      <details class="steps" id="build-steps" style="display:none;">
+        <summary>Show the worked solution</summary>
+        <div id="build-steps-content"></div>
+      </details>
+    </div>`;
+
+  document.getElementById('check-build').addEventListener('click', ()=>checkBuild(item));
+  ['input-a','input-b'].forEach(id=>{
+    document.getElementById(id).addEventListener('keydown', e=>{
+      if(e.key === 'Enter') checkBuild(item);
+    });
+  });
+}
+
+function renderFinanceBuild(item){
+  panel.innerHTML = `
+    <div class="card">
+      <h2 class="scenario-title">${item.title}</h2>
+      <p class="scenario-text">${item.scenario}</p>
+      <div class="given-box">
+        Principal: <span class="mono">a = $${item.given.P.toLocaleString()}</span> (at ${item.xLabel} = 0)<br>
+        Annual rate: <span class="mono">r = ${(item.given.r*100).toFixed(0)}%</span>
+      </div>
+
+      <p><strong>Build It — Step 1:</strong> which formula applies to this account?</p>
+      <div class="formula-choice" role="group" aria-label="Choose the compounding formula">
+        <button class="formula-option" id="opt-periodic" type="button" aria-pressed="false">
+          <strong>Periodic compounding</strong>
+          <span class="formula">A = P(1 + r/n)<sup>nt</sup></span>
+        </button>
+        <button class="formula-option" id="opt-continuous" type="button" aria-pressed="false">
+          <strong>Continuous compounding</strong>
+          <span class="formula">A = Pe<sup>rt</sup></span>
+        </button>
+      </div>
+
+      <div id="finance-fields" style="display:none;">
+        <div id="n-field-wrap" class="field-row" style="display:none;">
+          <div class="field">
+            <label for="input-n">n = (compounding periods per year — read the scenario)</label>
+            <input type="number" id="input-n" step="1" inputmode="numeric">
+          </div>
+        </div>
+        <p><strong>Step 2:</strong> find <span class="math">a</span> and <span class="math">b</span> for the model
+        <span class="math">y = a &middot; b<sup>x</sup></span> (x in years).</p>
+        <div class="field-row">
+          <div class="field">
+            <label for="input-a">a =</label>
+            <input type="number" id="input-a" step="any" inputmode="decimal">
+          </div>
+          <div class="field">
+            <label for="input-b">b = (round to 4 decimals)</label>
+            <input type="number" id="input-b" step="any" inputmode="decimal">
+          </div>
+        </div>
+        <button class="primary" id="check-build">Check</button>
+      </div>
+
+      <div class="feedback" id="build-feedback" aria-live="polite"></div>
+
+      <details class="steps" id="build-steps" style="display:none;">
+        <summary>Show the worked solution</summary>
+        <div id="build-steps-content"></div>
+      </details>
+    </div>`;
+
+  document.getElementById('opt-periodic').addEventListener('click', ()=>chooseFormula('periodic'));
+  document.getElementById('opt-continuous').addEventListener('click', ()=>chooseFormula('continuous'));
+
+  function chooseFormula(choice){
+    state.chosenFormula = choice;
+    document.getElementById('opt-periodic').setAttribute('aria-pressed', choice==='periodic');
+    document.getElementById('opt-continuous').setAttribute('aria-pressed', choice==='continuous');
+    document.getElementById('finance-fields').style.display = 'block';
+    document.getElementById('n-field-wrap').style.display = choice==='periodic' ? 'flex' : 'none';
+    document.getElementById('check-build').onclick = ()=>checkBuild(item);
+  }
+}
+
+function renderCoolingBuild(item){
+  let givenHTML = '';
+  if(item.buildType === 'percentDirect'){
+    givenHTML = `Starting amount: <span class="mono">${item.given.a} ${item.yLabel.split(' ')[0]}</span> (at ${item.xLabel} = 0)`;
+  } else if(item.buildType === 'continuousDecay'){
+    givenHTML = `Starting amount: <span class="mono">${item.given.a} ${item.yLabel.split(' ')[0]}</span> (at ${item.xLabel} = 0)<br>
+      Continuous decay rate: <span class="mono">${Math.abs(item.given.r*100)}% per ${item.xLabel}</span>`;
+  } else { // newton
+    givenHTML = `Starting temperature: <span class="mono">${item.given.T0}°C</span> (at ${item.xLabel} = 0)<br>
+      Surrounding temperature: <span class="mono">${item.given.C}°C</span><br>
+      Later point: <span class="mono">${item.xLabel} = ${item.given.t2}, temperature = ${item.given.T2}°C</span>`;
+  }
+
+  panel.innerHTML = `
+    <div class="card">
+      <h2 class="scenario-title">${item.title}</h2>
+      <p class="scenario-text">${item.scenario}</p>
+      <div class="given-box">${givenHTML}</div>
+
+      <p><strong>Build It — Step 1:</strong> what value does ${item.yLabel.split(' ')[0]} approach in the long run (the asymptote)?</p>
+      <div class="field-row">
+        <div class="field">
+          <label for="input-c">C = (long-run value / asymptote)</label>
+          <input type="number" id="input-c" step="any" inputmode="decimal">
+        </div>
+      </div>
+
+      <p><strong>Step 2:</strong> find <span class="math">a</span> and <span class="math">b</span> for the model
+      <span class="math">y = C + a &middot; b<sup>x</sup></span>.</p>
+      <div class="field-row">
+        <div class="field">
+          <label for="input-a">a =</label>
+          <input type="number" id="input-a" step="any" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="input-b">b = (round to 3 decimals)</label>
+          <input type="number" id="input-b" step="any" inputmode="decimal">
+        </div>
+      </div>
+
+      <button class="primary" id="check-build">Check</button>
+      <div class="feedback" id="build-feedback" aria-live="polite"></div>
+
+      <details class="steps" id="build-steps" style="display:none;">
+        <summary>Show the worked solution</summary>
+        <div id="build-steps-content"></div>
+      </details>
+    </div>`;
+
+  document.getElementById('check-build').addEventListener('click', ()=>checkBuild(item));
+  ['input-c','input-a','input-b'].forEach(id=>{
+    document.getElementById(id).addEventListener('keydown', e=>{
+      if(e.key === 'Enter') checkBuild(item);
+    });
+  });
+}
+
+function checkCoolingBuild(item, a, b, C, fb){
+  const inC = parseFloat(document.getElementById('input-c').value);
+  const inA = parseFloat(document.getElementById('input-a').value);
+  const inB = parseFloat(document.getElementById('input-b').value);
+
+  if(isNaN(inC) || isNaN(inA) || isNaN(inB)){
+    fb.classList.add('incorrect');
+    fb.textContent = 'Fill in C, a, and b before checking.';
+    return;
+  }
+
+  const cOK = withinTol(inC, C, 0.01, 0.5);
+  const aOK = withinTol(inA, a, 0.01, 0.5);
+  const bOK = withinTol(inB, b, 0.01, 0.01);
+
+  if(cOK && aOK && bOK){
+    fb.classList.add('correct');
+    fb.textContent = `Correct — C = ${round(C,2)}, a ≈ ${round(a,2)}, b ≈ ${round(b,3)}. Model built.`;
+    state.streak++;
+    state.model = { a, b, C };
+    updateStatusRow();
+    document.getElementById('check-build').disabled = true;
+    proceedAfterCorrect(fb, ()=>{ state.phase='evalRound'; render(); });
+    return;
+  }
+
+  state.streak = 0;
+  updateStatusRow();
+  fb.classList.add('incorrect');
+  if(!cOK){
+    fb.textContent = 'Check C first — what single number does the quantity level off toward as time goes on?';
+  } else if(!aOK){
+    fb.textContent = 'C looks right. Now check a — it should be the starting value minus C.';
+  } else if(state.buildAttempts === 1){
+    fb.textContent = 'C and a look right. Re-check your b calculation.';
+  } else {
+    fb.textContent = 'Still off. Open "Show the worked solution" below if you\'d like to see the steps.';
+    revealBuildSteps(item, a, b);
+  }
+}
+
+function checkBuild(item){
+  state.buildAttempts++;
+  const { a, b, C } = solveModel(item);
+  const fb = document.getElementById('build-feedback');
+  fb.className = 'feedback show';
+
+  if(item.kind === 'finance'){
+    checkFinanceBuild(item, a, b, fb);
+    return;
+  }
+  if(item.kind === 'cooling'){
+    checkCoolingBuild(item, a, b, C, fb);
+    return;
+  }
+
+  const inA = parseFloat(document.getElementById('input-a').value);
+  const inB = parseFloat(document.getElementById('input-b').value);
+
+  if(isNaN(inA) || isNaN(inB)){
+    fb.classList.add('incorrect');
+    fb.textContent = 'Enter a number for both a and b before checking.';
+    return;
+  }
+
+  const aOK = withinTol(inA, a, 0.01, 0.5);
+  const bOK = withinTol(inB, b, 0.01, 0.01);
+
+  if(aOK && bOK){
+    fb.classList.add('correct');
+    fb.textContent = `Correct — a ≈ ${round(a,3)}, b ≈ ${round(b,3)}. Model built.`;
+    state.streak++;
+    state.model = { a, b, C:0 };
+    updateStatusRow();
+    document.getElementById('check-build').disabled = true;
+    proceedAfterCorrect(fb, ()=>{ state.phase='evalRound'; render(); });
+  } else {
+    state.streak = 0;
+    updateStatusRow();
+    fb.classList.add('incorrect');
+    if(state.buildAttempts === 1){
+      fb.textContent = !aOK && item.buildType==='startAndPoint'
+        ? 'Check a first — it should just be the given starting value at x = 0.'
+        : 'Not quite. Re-check your ratio and exponent — try again.';
+    } else {
+      fb.textContent = 'Still off. Open "Show the worked solution" below if you\'d like to see the steps.';
+      revealBuildSteps(item, a, b);
+    }
+  }
+}
+
+function checkFinanceBuild(item, a, b, fb){
+  if(!state.chosenFormula){
+    fb.classList.add('incorrect');
+    fb.textContent = 'Choose a formula first — periodic or continuous.';
+    return;
+  }
+  const formulaOK = state.chosenFormula === item.given.type;
+
+  const inA = parseFloat(document.getElementById('input-a').value);
+  const inB = parseFloat(document.getElementById('input-b').value);
+  let nOK = true, inN = null;
+  if(state.chosenFormula === 'periodic'){
+    inN = parseFloat(document.getElementById('input-n').value);
+    nOK = !isNaN(inN) && Math.abs(inN - item.given.n) < 0.5;
+  }
+
+  if(isNaN(inA) || isNaN(inB) || (state.chosenFormula==='periodic' && isNaN(inN))){
+    fb.classList.add('incorrect');
+    fb.textContent = 'Fill in every field before checking.';
+    return;
+  }
+
+  const aOK = withinTol(inA, a, 0.01, 0.5);
+  const bOK = withinTol(inB, b, 0.01, 0.001);
+
+  if(formulaOK && nOK && aOK && bOK){
+    fb.classList.add('correct');
+    fb.textContent = `Correct — a ≈ ${round(a,2)}, b ≈ ${round(b,4)}. Model built.`;
+    state.streak++;
+    state.model = { a, b, C:0 };
+    updateStatusRow();
+    document.getElementById('check-build').disabled = true;
+    proceedAfterCorrect(fb, ()=>{ state.phase='evalRound'; render(); });
+    return;
+  }
+
+  state.streak = 0;
+  updateStatusRow();
+  fb.classList.add('incorrect');
+
+  if(!formulaOK){
+    fb.textContent = state.chosenFormula === 'continuous'
+      ? 'Not quite — re-read the scenario. Does it say "continuously," or does it give a specific compounding frequency?'
+      : 'Not quite — re-read the scenario. Is a compounding frequency given, or does it say "continuously"?';
+  } else if(!nOK){
+    fb.textContent = 'Formula choice is right, but double-check n — how many times per year does the scenario say it compounds?';
+  } else if(state.buildAttempts === 1){
+    fb.textContent = 'Formula and n look right. Re-check your a and b calculation.';
+  } else {
+    fb.textContent = 'Still off. Open "Show the worked solution" below if you\'d like to see the steps.';
+    revealBuildSteps(item, a, b);
+  }
+}
+
+function revealBuildSteps(item, a, b){
+  const details = document.getElementById('build-steps');
+  const content = document.getElementById('build-steps-content');
+  let html = '';
+  if(item.kind === 'finance'){
+    html = item.given.type === 'continuous'
+      ? `
+        <div class="step-line">Scenario says "continuous compounding" → A = Pe<sup>rt</sup></div>
+        <div class="step-line">a = P = ${item.given.P}</div>
+        <div class="step-line">b = e<sup>r</sup> = e<sup>${item.given.r}</sup> ≈ ${round(b,4)}</div>`
+      : `
+        <div class="step-line">Scenario gives a compounding frequency → A = P(1 + r/n)<sup>nt</sup></div>
+        <div class="step-line">n = ${item.given.n} (periods per year)</div>
+        <div class="step-line">a = P = ${item.given.P}</div>
+        <div class="step-line">b = (1 + r/n)<sup>n</sup> = (1 + ${item.given.r}/${item.given.n})<sup>${item.given.n}</sup> ≈ ${round(b,4)}</div>`;
+    content.innerHTML = html;
+    details.style.display = 'block';
+    details.open = true;
+    return;
+  }
+  if(item.kind === 'cooling'){
+    const C = item.given.C;
+    if(item.buildType === 'percentDirect'){
+      html = `
+        <div class="step-line">Long run: the amount decays toward 0 → C = 0</div>
+        <div class="step-line">a = ${item.given.a}  (the value at ${item.xLabel} = 0)</div>
+        <div class="step-line">"decreases by ${item.given.percent*100}% each ${item.xLabel}" → b = 1 − ${item.given.percent} = ${round(b,3)}</div>`;
+    } else if(item.buildType === 'continuousDecay'){
+      html = `
+        <div class="step-line">Long run: the amount decays toward 0 → C = 0</div>
+        <div class="step-line">a = ${item.given.a}  (the value at ${item.xLabel} = 0)</div>
+        <div class="step-line">continuous rate r = ${item.given.r} → b = e<sup>r</sup> = e<sup>${item.given.r}</sup> ≈ ${round(b,4)}</div>`;
+    } else { // newton
+      html = `
+        <div class="step-line">Long run: the temperature levels off at the surrounding temperature → C = ${C}</div>
+        <div class="step-line">a = T₀ − C = ${item.given.T0} − ${C} = ${round(a,2)}</div>
+        <div class="step-line">${item.given.T2} − ${C} = ${round(a,2)} &middot; b<sup>${item.given.t2}</sup></div>
+        <div class="step-line">b = ((${item.given.T2}−${C}) / ${round(a,2)})<sup>1/${item.given.t2}</sup> ≈ ${round(b,3)}</div>`;
+    }
+    content.innerHTML = html;
+    details.style.display = 'block';
+    details.open = true;
+    return;
+  }
+  if(item.buildType === 'startAndPoint'){
+    html = `
+      <div class="step-line">a = ${item.given.a}  (the value at ${item.xLabel} = 0)</div>
+      <div class="step-line">${item.given.y2} = ${item.given.a} &middot; b<sup>${item.given.x2}</sup></div>
+      <div class="step-line">b<sup>${item.given.x2}</sup> = ${round(item.given.y2/item.given.a,4)}</div>
+      <div class="step-line">b = (${round(item.given.y2/item.given.a,4)})<sup>1/${item.given.x2}</sup> ≈ ${round(b,3)}</div>`;
+  } else {
+    const { x1,y1,x2,y2 } = item.given;
+    const [xa,ya,xb,yb] = x1 < x2 ? [x1,y1,x2,y2] : [x2,y2,x1,y1];
+    html = `
+      <div class="step-line">Order the points by ${item.xLabel}: (${xa}, ${ya}) then (${xb}, ${yb})</div>
+      <div class="step-line">b = (${yb}/${ya})<sup>1/(${xb}−${xa})</sup> ≈ ${round(b,3)}</div>
+      <div class="step-line">a = ${ya} / b<sup>${xa}</sup> ≈ ${round(a,3)}</div>`;
+  }
+  content.innerHTML = html;
+  details.style.display = 'block';
+  details.open = true;
+}
+
+/* ---------------------------------------------------------
+   PHASE 2 & 3 — EVALUATE / SOLVE ROUNDS
+--------------------------------------------------------- */
+function renderRound(item, kind){
+  if(kind==='evaluate') state.evalAttempts = 0; else state.solveAttempts = 0;
+  const { a, b, C } = state.model;
+  const roundData = item[kind];
+  const roundLabel = kind === 'evaluate' ? 'Solve It — Evaluate' : 'Solve It — Solve';
+  const bannerHTML = Math.abs(C) < 1e-9
+    ? `y = ${round(a,2)} &middot; ${round(b,3)}<sup>x</sup>`
+    : `y = ${round(C,2)} + ${round(a,2)} &middot; ${round(b,3)}<sup>x</sup>`;
+
+  panel.innerHTML = `
+    <div class="card">
+      <div class="model-banner">${bannerHTML}</div>
+      <h2 class="scenario-title">${roundLabel}</h2>
+      ${renderCurve(a,b,C,item)}
+      <p style="margin-top:1rem;">${roundData.prompt}</p>
+      <div class="field-row">
+        <div class="field">
+          <label for="round-input">${kind==='evaluate' ? 'Your answer (' + item.yLabel + ')' : 'Your answer (' + item.xLabel + ')'}</label>
+          <input type="number" id="round-input" step="any" inputmode="decimal">
+        </div>
+      </div>
+      <button class="primary" id="check-round">Check</button>
+      <div class="feedback" id="round-feedback" aria-live="polite"></div>
+      <details class="steps" id="round-steps" style="display:none;">
+        <summary>Show the worked solution</summary>
+        <div id="round-steps-content"></div>
+      </details>
+    </div>`;
+
+  document.getElementById('check-round').addEventListener('click', ()=>checkRound(item,kind));
+  document.getElementById('round-input').addEventListener('keydown', e=>{
+    if(e.key==='Enter') checkRound(item,kind);
+  });
+}
+
+function checkRound(item, kind){
+  const { a, b, C } = state.model;
+  const roundData = item[kind];
+  const correct = kind==='evaluate' ? evaluateModel(a,b,roundData.x,C) : solveForX(a,b,roundData.y,C);
+  const relPct = kind==='evaluate' ? 0.02 : 0.03;
+  const absMin = kind==='evaluate' ? 1 : 0.15;
+
+  const inVal = parseFloat(document.getElementById('round-input').value);
+  const fb = document.getElementById('round-feedback');
+  fb.className = 'feedback show';
+
+  if(kind==='evaluate') state.evalAttempts++; else state.solveAttempts++;
+
+  if(isNaN(inVal)){
+    fb.classList.add('incorrect');
+    fb.textContent = 'Enter a number before checking.';
+    return;
+  }
+
+  if(withinTol(inVal, correct, relPct, absMin)){
+    fb.classList.add('correct');
+    fb.textContent = `Correct — ≈ ${round(correct, kind==='evaluate'?0:1)}.`;
+    state.streak++;
+    updateStatusRow();
+    document.getElementById('check-round').disabled = true;
+    proceedAfterCorrect(fb, ()=>{
+      if(kind==='evaluate'){ state.phase='solveRound'; render(); }
+      else { state.phase='reflect'; render(); }
+    });
+  } else {
+    state.streak = 0;
+    updateStatusRow();
+    fb.classList.add('incorrect');
+    const attempts = kind==='evaluate' ? state.evalAttempts : state.solveAttempts;
+    if(attempts === 1){
+      fb.textContent = kind==='evaluate'
+        ? 'Not quite — substitute the given x directly into the model.'
+        : (Math.abs(C) < 1e-9
+            ? 'Not quite — set the model equal to the target value, then isolate the exponential before taking a log.'
+            : 'Not quite — subtract C from both sides first to isolate the exponential part, then take a log.');
+    } else {
+      fb.textContent = 'Still off. Open "Show the worked solution" below if you\'d like to see the steps.';
+      revealRoundSteps(item, kind, a, b, C, correct);
+    }
+  }
+}
+
+function revealRoundSteps(item, kind, a, b, C, correct){
+  const details = document.getElementById('round-steps');
+  const content = document.getElementById('round-steps-content');
+  const hasShift = Math.abs(C) > 1e-9;
+  let html = '';
+  if(kind==='evaluate'){
+    html = hasShift
+      ? `
+        <div class="step-line">y = ${round(C,2)} + ${round(a,2)} &middot; ${round(b,3)}<sup>${item.evaluate.x}</sup></div>
+        <div class="step-line">y ≈ ${round(correct,0)}</div>`
+      : `
+        <div class="step-line">y = ${round(a,2)} &middot; ${round(b,3)}<sup>${item.evaluate.x}</sup></div>
+        <div class="step-line">y ≈ ${round(correct,0)}</div>`;
+  } else {
+    const shifted = item.solve.y - C;
+    html = hasShift
+      ? `
+        <div class="step-line">${item.solve.y} = ${round(C,2)} + ${round(a,2)} &middot; ${round(b,3)}<sup>x</sup></div>
+        <div class="step-line">Subtract C: ${item.solve.y} − ${round(C,2)} = ${round(a,2)} &middot; ${round(b,3)}<sup>x</sup> → ${round(shifted,2)} = ${round(a,2)} &middot; ${round(b,3)}<sup>x</sup></div>
+        <div class="step-line">${round(shifted,4)}/${round(a,2)} = ${round(b,3)}<sup>x</sup> → ${round(shifted/a,4)} = ${round(b,3)}<sup>x</sup></div>
+        <div class="step-line">x = log(${round(shifted/a,4)}) / log(${round(b,3)}) ≈ ${round(correct,1)}</div>`
+      : `
+        <div class="step-line">${item.solve.y} = ${round(a,2)} &middot; ${round(b,3)}<sup>x</sup></div>
+        <div class="step-line">${item.solve.y}/${round(a,2)} = ${round(b,3)}<sup>x</sup> → ${round(item.solve.y/a,4)} = ${round(b,3)}<sup>x</sup></div>
+        <div class="step-line">x = log(${round(item.solve.y/a,4)}) / log(${round(b,3)}) ≈ ${round(correct,1)}</div>`;
+  }
+  content.innerHTML = html;
+  details.style.display = 'block';
+  details.open = true;
+}
+
+
+/* ---------------------------------------------------------
+   PHASE 4 — CHECK YOUR THINKING (reflection, not graded)
+--------------------------------------------------------- */
+function renderReflect(item){
+  panel.innerHTML = `
+    <div class="card">
+      <h2 class="scenario-title">Nice work — ${item.title} complete</h2>
+      <div class="reflect-box">
+        <p class="prompt">Check your thinking:</p>
+        <p>${item.reflect}</p>
+        <textarea id="reflect-note" placeholder="Jot a quick note to yourself (optional — not graded, not saved)."></textarea>
+        <p class="reflect-note">This isn't collected or graded — it's just here to help the idea stick.</p>
+      </div>
+      <div class="nav-row">
+        <button class="primary" id="next-item">${isLastItem() ? 'Finish Growth Mode' : 'Next Item'}</button>
+      </div>
+    </div>`;
+  document.getElementById('next-item').addEventListener('click', nextItem);
+}
+
+function isLastItem(){ return state.index === currentItems().length - 1; }
+
+function nextItem(){
+  if(isLastItem()){
+    panel.innerHTML = `
+      <div class="card coming-soon-card">
+        <h2>Growth Mode complete 🎉</h2>
+        <p>You built and solved all ${currentItems().length} Growth Mode scenarios. Finance and Cooling &amp; Decay modes are on the way.</p>
+      </div>`;
+    return;
+  }
+  state.index++;
+  state.phase = 'build';
+  state.model = null;
+  render();
+}
+
+/* ---------------------------------------------------------
+   VISUAL — small inline SVG curve for the built model,
+   marking the known point(s) used to build it.
+--------------------------------------------------------- */
+function renderCurve(a,b,C,item){
+  const w = 600, h = 200, pad = 30;
+
+  let anchorX;
+  if(item.kind === 'cooling' && item.buildType === 'newton') anchorX = item.given.t2;
+  else if(item.kind === 'finance' || item.kind === 'cooling') anchorX = 0;
+  else if(item.buildType === 'twoPoints') anchorX = Math.max(item.given.x1, item.given.x2);
+  else anchorX = item.given.x2;
+
+  const solveXVal = solveForX(a,b,item.solve.y,C);
+  const xMax = Math.max(item.evaluate.x, anchorX, isFinite(solveXVal) ? solveXVal : 0) * 1.15;
+
+  const steps = 60;
+  const samples = [];
+  for(let i=0;i<=steps;i++){
+    const x = (xMax/steps)*i;
+    samples.push([x, evaluateModel(a,b,x,C)]);
+  }
+  const ys = samples.map(p=>p[1]).concat([C]);
+  let yMin = Math.min(...ys), yMax = Math.max(...ys);
+  if(yMin === yMax){ yMin -= 1; yMax += 1; }
+  const yPad = (yMax - yMin) * 0.08;
+  yMin -= yPad; yMax += yPad;
+
+  const toX = x => pad + (x/xMax) * (w - 2*pad);
+  const toY = y => h - pad - ((y - yMin)/(yMax - yMin)) * (h - 2*pad);
+
+  const path = samples.map(([x,y],i)=> (i===0?'M':'L') + toX(x).toFixed(1) + ',' + toY(y).toFixed(1)).join(' ');
+
+  let knownPts = [];
+  if(item.kind === 'cooling'){
+    knownPts = item.buildType === 'newton'
+      ? [[0, item.given.T0],[item.given.t2, item.given.T2]]
+      : [[0, item.given.a]];
+  } else if(item.kind === 'finance'){
+    knownPts = [[0, item.given.P]];
+  } else if(item.buildType === 'startAndPoint'){
+    knownPts = [[0,item.given.a],[item.given.x2,item.given.y2]];
+  } else {
+    knownPts = [[item.given.x1,item.given.y1],[item.given.x2,item.given.y2]];
+  }
+  const dots = knownPts.map(([x,y])=>
+    `<circle cx="${toX(x).toFixed(1)}" cy="${toY(y).toFixed(1)}" r="4.5" fill="#e2a63b" stroke="#0b3d3f" stroke-width="1"/>`
+  ).join('');
+
+  const asymptoteLine = Math.abs(C) > 1e-9
+    ? `<line x1="${pad}" y1="${toY(C).toFixed(1)}" x2="${w-pad}" y2="${toY(C).toFixed(1)}" stroke="#c98a2b" stroke-width="1.5" stroke-dasharray="5,4"/>
+       <text x="${w-pad}" y="${(toY(C)-6).toFixed(1)}" font-size="10" fill="#7a5310" text-anchor="end">asymptote: ${round(C,1)}</text>`
+    : '';
+
+  return `<svg class="curve" viewBox="0 0 ${w} ${h}" role="img" aria-label="Model curve, with the known data point(s) and asymptote marked">
+    <line x1="${pad}" y1="${h-pad}" x2="${w-pad}" y2="${h-pad}" stroke="#dcd6c8" stroke-width="1.5"/>
+    <line x1="${pad}" y1="${pad}" x2="${pad}" y2="${h-pad}" stroke="#dcd6c8" stroke-width="1.5"/>
+    ${asymptoteLine}
+    <path d="${path}" fill="none" stroke="#12595c" stroke-width="2.5"/>
+    ${dots}
+    <text x="${w-pad}" y="${h-8}" font-size="11" fill="#5b6b6c" text-anchor="end">${item.xLabel}</text>
+    <text x="${pad+4}" y="${pad-8}" font-size="11" fill="#5b6b6c">${item.yLabel}</text>
+  </svg>`;
+}
+
+function round(n, d){ const f = Math.pow(10,d); return Math.round(n*f)/f; }
+
+/* ---------------------------------------------------------
+   INIT
+--------------------------------------------------------- */
+render();
+</script>
+</body>
+</html>
